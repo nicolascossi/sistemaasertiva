@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(head -50 /c/Users/nicol/OneDrive/Desktop/ASERTIVA/app/\\\\\\(app\\\\\\)/layout.tsx)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm run:*)"
+    ]
+  }
+}
