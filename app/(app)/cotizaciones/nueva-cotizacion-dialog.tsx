@@ -448,7 +448,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Atención a (opcional)
+                Atte (opcional)
               </Label>
               <Input
                 placeholder="Ej: Lic. García..."

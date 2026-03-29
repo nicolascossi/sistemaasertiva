@@ -500,7 +500,7 @@ export function CotizacionDetailDialog({ cotizacion, open, onOpenChange, onUpdat
           {/* Atte + Expte + Forma de Pago + Observaciones */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Atención a</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Atte</p>
               {editing ? (
                 <Input
                   value={atte}
