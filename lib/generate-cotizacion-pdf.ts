@@ -412,35 +412,31 @@ export async function generarCotizacionPDF(
   doc.text("ENVIO BONIFICADO A PARTIR DE $120.000,00", margin, condY + 29)
 
   // Gracias / URL / QR
+  const qrSize = 24
   const graciasY = condY + 39
-  doc.setFont("helvetica", "bold")
-  doc.setFontSize(9)
-  doc.setTextColor(...pink)
-  doc.text("Gracias por elegirnos!", pageW / 2, graciasY, { align: "center" })
 
-  if (webEmpresa) {
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(8)
-    doc.setTextColor(...darkGray)
-    doc.text(webEmpresa.toUpperCase(), rightEdge, graciasY, { align: "right" })
-  }
-
-  // QR Code
+  // QR a la derecha — no tapa ningún texto
   try {
     const qrDataUrl = await QRCode.toDataURL("https://asertiva.com.ar/", {
       width: 200,
       margin: 1,
       color: { dark: "#323232", light: "#ffffff" },
     })
-    const qrSize = 22
-    doc.addImage(qrDataUrl, "PNG", margin, graciasY - qrSize + 2, qrSize, qrSize)
+    const qrX = rightEdge - qrSize
+    const qrY = condY + 5
+    doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize)
     doc.setFont("helvetica", "normal")
     doc.setFontSize(6)
     doc.setTextColor(130, 130, 130)
-    doc.text("asertiva.com.ar", margin + qrSize / 2, graciasY + 5, { align: "center" })
+    doc.text("asertiva.com.ar", qrX + qrSize / 2, qrY + qrSize + 3, { align: "center" })
   } catch {
     // QR no disponible
   }
+
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(9)
+  doc.setTextColor(...pink)
+  doc.text("Gracias por elegirnos!", margin + (pageW - margin * 2 - qrSize - 5) / 2 + margin, graciasY, { align: "center" })
 
   doc.save(`cotizacion-${cotizacion.numero}.pdf`)
 }
