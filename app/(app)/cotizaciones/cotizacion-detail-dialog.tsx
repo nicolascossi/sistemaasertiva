@@ -38,6 +38,8 @@ export function CotizacionDetailDialog({ cotizacion, open, onOpenChange, onUpdat
   const [items, setItems] = useState<(CotizacionItem & { tempId: string })[]>([])
   const [observaciones, setObservaciones] = useState("")
   const [formaPago, setFormaPago] = useState("")
+  const [atte, setAtte] = useState("")
+  const [expte, setExpte] = useState("")
   const [saving, setSaving] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [estadoLoading, setEstadoLoading] = useState(false)
@@ -123,6 +125,8 @@ export function CotizacionDetailDialog({ cotizacion, open, onOpenChange, onUpdat
     )
     setObservaciones(cotizacion.observaciones ?? "")
     setFormaPago(cotizacion.forma_pago ?? "")
+    setAtte(cotizacion.atte ?? "")
+    setExpte(cotizacion.expte ?? "")
     setEditing(true)
   }
 
@@ -164,7 +168,7 @@ export function CotizacionDetailDialog({ cotizacion, open, onOpenChange, onUpdat
     try {
       await supabase
         .from("cotizaciones")
-        .update({ total, observaciones: observaciones || null, forma_pago: formaPago || null })
+        .update({ total, observaciones: observaciones || null, forma_pago: formaPago || null, atte: atte || null, expte: expte || null })
         .eq("id", cotizacion.id)
 
       await supabase.from("cotizacion_items").delete().eq("cotizacion_id", cotizacion.id)
@@ -227,7 +231,7 @@ export function CotizacionDetailDialog({ cotizacion, open, onOpenChange, onUpdat
         .single()
 
       const cotizacionParaPDF: Cotizacion = editing
-        ? { ...cotizacion, total, observaciones: observaciones || null, forma_pago: formaPago || null, cotizacion_items: items }
+        ? { ...cotizacion, total, observaciones: observaciones || null, forma_pago: formaPago || null, atte: atte || null, expte: expte || null, cotizacion_items: items }
         : cotizacion
 
       const { generarCotizacionPDF } = await import("@/lib/generate-cotizacion-pdf")
@@ -493,8 +497,38 @@ export function CotizacionDetailDialog({ cotizacion, open, onOpenChange, onUpdat
             </div>
           </div>
 
-          {/* Forma de Pago + Observaciones */}
+          {/* Atte + Expte + Forma de Pago + Observaciones */}
           <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Atención a</p>
+              {editing ? (
+                <Input
+                  value={atte}
+                  onChange={(e) => setAtte(e.target.value)}
+                  placeholder="Ej: Lic. García..."
+                  className="bg-white border-border text-sm"
+                />
+              ) : (
+                <p className="text-sm text-foreground bg-muted/30 rounded-md border border-border px-3 py-2 min-h-[36px]">
+                  {cotizacion.atte ?? <span className="text-muted-foreground italic">Sin especificar</span>}
+                </p>
+              )}
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Expediente</p>
+              {editing ? (
+                <Input
+                  value={expte}
+                  onChange={(e) => setExpte(e.target.value)}
+                  placeholder="Ej: EX-2024-001..."
+                  className="bg-white border-border text-sm"
+                />
+              ) : (
+                <p className="text-sm text-foreground bg-muted/30 rounded-md border border-border px-3 py-2 min-h-[36px]">
+                  {cotizacion.expte ?? <span className="text-muted-foreground italic">Sin especificar</span>}
+                </p>
+              )}
+            </div>
             <div>
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Forma de Pago</p>
               {editing ? (

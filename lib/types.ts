@@ -45,6 +45,8 @@ export interface Cotizacion {
   estado: CotizacionEstado
   observaciones: string | null
   forma_pago: string | null
+  atte: string | null
+  expte: string | null
   created_at: string
   updated_at: string
   cotizacion_items?: CotizacionItem[]

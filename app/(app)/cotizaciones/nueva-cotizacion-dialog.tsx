@@ -50,9 +50,11 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
   // --- Items de la cotizacion ---
   const [items, setItems] = useState<(CotizacionItem & { tempId: string })[]>([])
 
-  // --- Obs, forma de pago y estado general ---
+  // --- Obs, forma de pago, atte, expte y estado general ---
   const [observaciones, setObservaciones] = useState("")
   const [formaPago, setFormaPago] = useState("")
+  const [atte, setAtte] = useState("")
+  const [expte, setExpte] = useState("")
   const [saving, setSaving] = useState(false)
 
   const clienteRef = useRef<HTMLDivElement>(null)
@@ -69,6 +71,8 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
       setItems([])
       setObservaciones("")
       setFormaPago("")
+      setAtte("")
+      setExpte("")
     }
   }, [open])
 
@@ -203,6 +207,8 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
           estado: "borrador",
           observaciones: observaciones || null,
           forma_pago: formaPago || null,
+          atte: atte || null,
+          expte: expte || null,
         })
         .select()
         .single()
@@ -438,8 +444,30 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
             </div>
           )}
 
-          {/* FORMA DE PAGO + OBSERVACIONES */}
+          {/* ATTE + EXPTE + FORMA DE PAGO + OBSERVACIONES */}
           <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Atención a (opcional)
+              </Label>
+              <Input
+                placeholder="Ej: Lic. García..."
+                value={atte}
+                onChange={(e) => setAtte(e.target.value)}
+                className="bg-white border-border text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Expediente (opcional)
+              </Label>
+              <Input
+                placeholder="Ej: EX-2024-001..."
+                value={expte}
+                onChange={(e) => setExpte(e.target.value)}
+                className="bg-white border-border text-sm"
+              />
+            </div>
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Forma de Pago (opcional)
