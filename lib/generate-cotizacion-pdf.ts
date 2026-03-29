@@ -300,7 +300,7 @@ export async function generarCotizacionPDF(
       fillColor: [252, 252, 252],
     },
     columnStyles: {
-      0: { halign: "center", cellWidth: 13 },
+      0: { halign: "center", cellWidth: 17 },
       1: { halign: "left",   cellWidth: 27 },
       2: { halign: "left",   cellWidth: "auto" },
       3: { halign: "left",   cellWidth: 22 },
