@@ -178,7 +178,7 @@ export function ProductosClient({ initialData, error }: Props) {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setPinImportarOpen(true)}>
             <Upload className="mr-2 h-4 w-4" />
-            Importar CSV
+            Importar Excel
           </Button>
           <Button size="sm" onClick={requestNuevo}>
             <Plus className="mr-2 h-4 w-4" />
@@ -371,9 +371,9 @@ export function ProductosClient({ initialData, error }: Props) {
 
       {/* CSV Import dialog */}
       <CsvImportDialog
-        title="Importar Productos"
-        description="Importá tu lista de precios en formato CSV. La lista anterior será reemplazada."
-        expectedColumns={["COD_ARTIC", "DESCRIP", "DESC_ADIC", "MARCA", "LISTA"]}
+        title="Importar Lista de Precios"
+        description="Importá tu lista de precios desde Excel (.xlsx) o CSV. Todos los productos existentes serán reemplazados por la nueva lista."
+        expectedColumns={["COD_ARTIC", "DESCRIP", "DESC_ADIC", "PRECIO"]}
         apiEndpoint="/api/productos/import"
         onSuccess={() => { setCsvImportOpen(false); refresh() }}
         open={csvImportOpen}

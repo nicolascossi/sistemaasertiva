@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Upload, FileText, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Upload, FileText, AlertCircle, CheckCircle2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -25,6 +25,28 @@ interface CsvImportDialogProps {
   onOpenChange?: (open: boolean) => void
 }
 
+async function parseExcel(file: File): Promise<Record<string, string>[]> {
+  const XLSX = await import("xlsx")
+  const buffer = await file.arrayBuffer()
+  const wb = XLSX.read(buffer, { type: "array" })
+  const ws = wb.Sheets[wb.SheetNames[0]]
+  const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "" })
+  return rows.map((row) =>
+    Object.fromEntries(
+      Object.entries(row).map(([k, v]) => [k.trim().toUpperCase(), String(v ?? "")])
+    )
+  )
+}
+
+function isExcel(file: File) {
+  return (
+    file.name.endsWith(".xlsx") ||
+    file.name.endsWith(".xls") ||
+    file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    file.type === "application/vnd.ms-excel"
+  )
+}
+
 export function CsvImportDialog({
   title,
   description,
@@ -39,21 +61,31 @@ export function CsvImportDialog({
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<Record<string, string>[]>([])
+  const [totalRows, setTotalRows] = useState(0)
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [message, setMessage] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
-  function handleFile(f: File) {
+  async function handleFile(f: File) {
     setFile(f)
     setStatus("idle")
     setMessage("")
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const text = e.target?.result as string
-      const rows = parseCSV(text)
+    setPreview([])
+    setTotalRows(0)
+    try {
+      let rows: Record<string, string>[]
+      if (isExcel(f)) {
+        rows = await parseExcel(f)
+      } else {
+        const text = await f.text()
+        rows = parseCSV(text)
+      }
+      setTotalRows(rows.length)
       setPreview(rows.slice(0, 5))
+    } catch {
+      setStatus("error")
+      setMessage("No se pudo leer el archivo. Verificá que sea un Excel o CSV válido.")
     }
-    reader.readAsText(f)
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -67,8 +99,13 @@ export function CsvImportDialog({
     setStatus("loading")
     setMessage("")
     try {
-      const text = await file.text()
-      const rows = parseCSV(text)
+      let rows: Record<string, string>[]
+      if (isExcel(file)) {
+        rows = await parseExcel(file)
+      } else {
+        const text = await file.text()
+        rows = parseCSV(text)
+      }
       const res = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,7 +117,7 @@ export function CsvImportDialog({
         setMessage(data.error ?? "Error al importar")
       } else {
         setStatus("success")
-        setMessage(`${data.imported} registros importados correctamente`)
+        setMessage(`✓ ${data.imported} productos importados correctamente`)
         onSuccess()
       }
     } catch (err) {
@@ -99,10 +136,13 @@ export function CsvImportDialog({
     if (!o) {
       setFile(null)
       setPreview([])
+      setTotalRows(0)
       setStatus("idle")
       setMessage("")
     }
   }
+
+  const previewCols = preview.length > 0 ? Object.keys(preview[0]) : []
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -111,7 +151,7 @@ export function CsvImportDialog({
           {trigger ?? (
             <Button variant="outline" size="sm">
               <Upload className="mr-2 h-4 w-4" />
-              Importar CSV
+              Importar Excel
             </Button>
           )}
         </DialogTrigger>
@@ -125,7 +165,7 @@ export function CsvImportDialog({
         <div className="space-y-4">
           {/* Columns hint */}
           <div className="rounded-md bg-muted px-4 py-3">
-            <p className="mb-1 text-xs font-medium text-muted-foreground">Columnas esperadas:</p>
+            <p className="mb-1.5 text-xs font-medium text-muted-foreground">Columnas requeridas en el archivo:</p>
             <div className="flex flex-wrap gap-2">
               {expectedColumns.map((col) => (
                 <code key={col} className="rounded bg-background px-2 py-0.5 text-xs font-mono border border-border">
@@ -144,17 +184,22 @@ export function CsvImportDialog({
           >
             <FileText className="h-8 w-8 text-muted-foreground" />
             {file ? (
-              <p className="text-sm font-medium text-foreground">{file.name}</p>
+              <div className="space-y-0.5">
+                <p className="text-sm font-medium text-foreground">{file.name}</p>
+                {totalRows > 0 && (
+                  <p className="text-xs text-muted-foreground">{totalRows} filas detectadas</p>
+                )}
+              </div>
             ) : (
               <>
-                <p className="text-sm font-medium text-foreground">Arrastrá tu archivo CSV aquí</p>
-                <p className="text-xs text-muted-foreground">o hacé clic para seleccionar</p>
+                <p className="text-sm font-medium text-foreground">Arrastrá tu archivo aquí</p>
+                <p className="text-xs text-muted-foreground">o hacé clic para seleccionar · Excel (.xlsx) o CSV</p>
               </>
             )}
             <input
               ref={inputRef}
               type="file"
-              accept=".csv,.txt"
+              accept=".xlsx,.xls,.csv,.txt"
               className="hidden"
               onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
             />
@@ -164,14 +209,14 @@ export function CsvImportDialog({
           {preview.length > 0 && (
             <div>
               <p className="mb-2 text-xs font-medium text-muted-foreground">
-                Vista previa (primeras {preview.length} filas):
+                Vista previa — primeras {preview.length} de {totalRows} filas:
               </p>
-              <div className="overflow-auto rounded-md border border-border">
+              <div className="overflow-auto rounded-md border border-border max-h-44">
                 <table className="w-full text-xs">
-                  <thead className="bg-muted">
+                  <thead className="bg-muted sticky top-0">
                     <tr>
-                      {Object.keys(preview[0]).map((k) => (
-                        <th key={k} className="px-3 py-2 text-left font-medium text-foreground">
+                      {previewCols.map((k) => (
+                        <th key={k} className="px-3 py-2 text-left font-medium text-foreground whitespace-nowrap">
                           {k}
                         </th>
                       ))}
@@ -180,9 +225,9 @@ export function CsvImportDialog({
                   <tbody>
                     {preview.map((row, i) => (
                       <tr key={i} className="border-t border-border">
-                        {Object.values(row).map((v, j) => (
-                          <td key={j} className="px-3 py-1.5 text-muted-foreground">
-                            {v || "—"}
+                        {previewCols.map((k, j) => (
+                          <td key={j} className="px-3 py-1.5 text-muted-foreground whitespace-nowrap">
+                            {row[k] || "—"}
                           </td>
                         ))}
                       </tr>
@@ -193,12 +238,12 @@ export function CsvImportDialog({
             </div>
           )}
 
-          {/* Status message */}
+          {/* Status */}
           {message && (
             <div
               className={`flex items-center gap-2 rounded-md px-4 py-3 text-sm ${
                 status === "success"
-                  ? "bg-muted text-foreground"
+                  ? "bg-green-50 text-green-800 border border-green-200"
                   : "bg-destructive/10 text-destructive"
               }`}
             >
@@ -213,14 +258,24 @@ export function CsvImportDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => handleClose(false)}>
-            Cancelar
+          <Button variant="ghost" onClick={() => handleClose(false)} disabled={status === "loading"}>
+            {status === "success" ? "Cerrar" : "Cancelar"}
           </Button>
           <Button
             onClick={handleImport}
             disabled={!file || status === "loading" || status === "success"}
           >
-            {status === "loading" ? "Importando..." : "Importar"}
+            {status === "loading" ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Importando...
+              </>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                Importar
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

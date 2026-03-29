@@ -11,11 +11,14 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient()
 
     const records = rows.map((r: Record<string, string>) => ({
-      cod_artic: r["COD_ARTIC"] ?? r["cod_artic"] ?? "",
-      descrip: r["DESCRIP"] ?? r["descrip"] ?? "",
-      desc_adic: r["DESC_ADIC"] ?? r["desc_adic"] ?? null,
-      marca: r["MARCA"] ?? r["marca"] ?? null,
-      lista: parseFloat((r["LISTA"] ?? r["lista"] ?? "0").replace(",", ".")) || 0,
+      cod_artic: String(r["COD_ARTIC"] ?? r["cod_artic"] ?? "").trim(),
+      descrip: String(r["DESCRIP"] ?? r["descrip"] ?? "").trim(),
+      desc_adic: (r["DESC_ADIC"] ?? r["desc_adic"] ?? "").trim() || null,
+      marca: (r["MARCA"] ?? r["marca"] ?? "").trim() || null,
+      // Acepta PRECIO (Excel) o LISTA (CSV)
+      lista: parseFloat(
+        String(r["PRECIO"] ?? r["precio"] ?? r["LISTA"] ?? r["lista"] ?? "0").replace(",", ".")
+      ) || 0,
     })).filter((r) => r.cod_artic && r.descrip)
 
     // Borrar todos los productos existentes antes de importar la nueva lista
