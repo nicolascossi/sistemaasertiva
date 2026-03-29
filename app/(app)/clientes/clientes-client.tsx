@@ -127,9 +127,9 @@ export function ClientesClient({ initialData, error }: Props) {
         </div>
         <div className="flex items-center gap-2">
           <CsvImportDialog
-            title="Importar Clientes"
-            description="Importá tu base de clientes en formato CSV. Los registros existentes se actualizarán por COD_CLIENT."
-            expectedColumns={["COD_CLIENT", "RAZON_SOCI", "DOMICILIO", "LOCALIDAD", "C_POSTALI", "DENTIFTRI"]}
+            title="Importar Clientes desde Excel"
+            description="Importá la nómina de clientes desde el Excel de Tango. Todos los clientes existentes serán reemplazados por la nueva lista."
+            expectedColumns={["Codigo", "Razon social", "Domicilio", "Localidad", "Codigo postal", "Nro. de documento"]}
             apiEndpoint="/api/clientes/import"
             onSuccess={refresh}
           />
@@ -192,7 +192,7 @@ export function ClientesClient({ initialData, error }: Props) {
                 <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
                   {search
                     ? "No se encontraron clientes para la búsqueda."
-                    : "No hay clientes. Importá un CSV o creá uno manualmente."}
+                    : "No hay clientes. Importá el Excel de Tango o creá uno manualmente."}
                 </TableCell>
               </TableRow>
             ) : (

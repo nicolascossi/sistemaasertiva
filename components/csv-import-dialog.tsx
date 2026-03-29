@@ -117,7 +117,7 @@ export function CsvImportDialog({
         setMessage(data.error ?? "Error al importar")
       } else {
         setStatus("success")
-        setMessage(`✓ ${data.imported} productos importados correctamente`)
+        setMessage(`✓ ${data.imported} registros importados correctamente`)
         onSuccess()
       }
     } catch (err) {
