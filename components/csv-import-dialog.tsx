@@ -33,7 +33,10 @@ async function parseExcel(file: File): Promise<Record<string, string>[]> {
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: "" })
   return rows.map((row) =>
     Object.fromEntries(
-      Object.entries(row).map(([k, v]) => [k.trim().toUpperCase(), String(v ?? "")])
+      Object.entries(row).map(([k, v]) => [
+        k.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+        String(v ?? ""),
+      ])
     )
   )
 }
@@ -156,7 +159,7 @@ export function CsvImportDialog({
           )}
         </DialogTrigger>
       )}
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl w-[95vw] overflow-hidden">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
