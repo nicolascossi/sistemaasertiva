@@ -56,6 +56,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
   const [atte, setAtte] = useState("")
   const [expte, setExpte] = useState("")
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const clienteRef = useRef<HTMLDivElement>(null)
   const productoRef = useRef<HTMLDivElement>(null)
@@ -73,6 +74,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
       setFormaPago("")
       setAtte("")
       setExpte("")
+      setSaveError(null)
     }
   }, [open])
 
@@ -102,7 +104,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
         .from("productos")
         .select("*")
         .or(`cod_artic.ilike.%${productoQuery}%,descrip.ilike.%${productoQuery}%`)
-        .limit(10)
+        .limit(100)
       setProductoSuggestions(data ?? [])
       setShowProductoSugg(true)
       setProductoLoading(false)
@@ -192,10 +194,24 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
     if (!clienteSeleccionado) return
     if (items.length === 0) return
     setSaving(true)
+    setSaveError(null)
     try {
-      // Obtener el proximo numero de cotizacion via funcion SQL
-      const { data: numero, error: numError } = await supabase.rpc("get_next_cotizacion_numero")
-      if (numError || !numero) throw numError ?? new Error("No se pudo generar el número de cotización")
+      // Obtener el proximo numero de cotizacion via funcion SQL, con fallback manual
+      let numero: number
+      const { data: rpcData, error: numError } = await supabase.rpc("get_next_cotizacion_numero")
+      if (numError || rpcData == null) {
+        // Fallback: MAX(numero) + 1
+        const { data: maxData, error: maxError } = await supabase
+          .from("cotizaciones")
+          .select("numero")
+          .order("numero", { ascending: false })
+          .limit(1)
+          .single()
+        if (maxError && maxError.code !== "PGRST116") throw new Error("No se pudo generar el número de cotización")
+        numero = maxData ? (maxData.numero as number) + 1 : 1
+      } else {
+        numero = rpcData as number
+      }
 
       const { data: cot, error: cotError } = await supabase
         .from("cotizaciones")
@@ -233,6 +249,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
       onOpenChange(false)
     } catch (err) {
       console.error(err)
+      setSaveError(err instanceof Error ? err.message : "Error al guardar la cotización. Revisá la consola.")
     } finally {
       setSaving(false)
     }
@@ -495,10 +512,14 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
 
         {/* FOOTER */}
         <div className="px-6 py-4 border-t border-border flex items-center justify-between bg-muted/20">
-          <div className="text-sm text-muted-foreground">
-            {items.length > 0
-              ? `${items.length} artículo${items.length !== 1 ? "s" : ""} · Total: ${formatCurrency(total)}`
-              : "Agregá artículos para continuar"}
+          <div className="text-sm">
+            {saveError ? (
+              <span className="text-red-600 font-medium">{saveError}</span>
+            ) : items.length > 0 ? (
+              <span className="text-muted-foreground">{items.length} artículo{items.length !== 1 ? "s" : ""} · Total: {formatCurrency(total)}</span>
+            ) : (
+              <span className="text-muted-foreground">Agregá artículos para continuar</span>
+            )}
           </div>
           <div className="flex gap-3">
             <Button
