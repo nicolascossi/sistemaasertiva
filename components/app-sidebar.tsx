@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Package, Users, FileText, LayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -33,10 +34,15 @@ export function AppSidebar() {
 
   return (
     <aside className="flex h-screen w-56 flex-col border-r border-border bg-white">
-      <div className="flex h-14 items-center border-b border-border px-5">
-        <span className="text-sm font-bold uppercase tracking-widest text-foreground">
-          ASERTIVA
-        </span>
+      <div className="flex h-16 items-center justify-center border-b border-border px-4">
+        <Image
+          src="/logo-asertiva.png"
+          alt="Asertiva S.A."
+          width={140}
+          height={56}
+          className="object-contain"
+          priority
+        />
       </div>
       <nav className="flex flex-1 flex-col p-3 gap-0.5">
         {navItems.map((item) => {
