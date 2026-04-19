@@ -159,13 +159,13 @@ export function CsvImportDialog({
           )}
         </DialogTrigger>
       )}
-      <DialogContent className="max-w-2xl w-[95vw] overflow-hidden">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl w-[95vw] flex flex-col max-h-[90vh]">
+        <DialogHeader className="shrink-0">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto flex-1 pr-1">
           {/* Columns hint */}
           <div className="rounded-md bg-muted px-4 py-3">
             <p className="mb-1.5 text-xs font-medium text-muted-foreground">Columnas requeridas en el archivo:</p>
@@ -260,7 +260,7 @@ export function CsvImportDialog({
           )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0 pt-2">
           <Button variant="ghost" onClick={() => handleClose(false)} disabled={status === "loading"}>
             {status === "success" ? "Cerrar" : "Cancelar"}
           </Button>
