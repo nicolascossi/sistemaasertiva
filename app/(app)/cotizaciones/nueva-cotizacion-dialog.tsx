@@ -52,7 +52,6 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
 
   // --- Obs, forma de pago, atte, expte y estado general ---
   const [observaciones, setObservaciones] = useState("")
-  const [formaPago, setFormaPago] = useState("")
   const [atte, setAtte] = useState("")
   const [expte, setExpte] = useState("")
   const [saving, setSaving] = useState(false)
@@ -71,7 +70,6 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
       setProductoSuggestions([])
       setItems([])
       setObservaciones("")
-      setFormaPago("")
       setAtte("")
       setExpte("")
       setSaveError(null)
@@ -222,7 +220,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
           total,
           estado: "borrador",
           observaciones: observaciones || null,
-          forma_pago: formaPago || null,
+          forma_pago: clienteSeleccionado.forma_pago || null,
           atte: atte || null,
           expte: expte || null,
         })
@@ -482,17 +480,6 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
                 placeholder="Ej: EX-2024-001..."
                 value={expte}
                 onChange={(e) => setExpte(e.target.value)}
-                className="bg-white border-border text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Forma de Pago (opcional)
-              </Label>
-              <Input
-                placeholder="Ej: Cuenta corriente 30 días..."
-                value={formaPago}
-                onChange={(e) => setFormaPago(e.target.value)}
                 className="bg-white border-border text-sm"
               />
             </div>

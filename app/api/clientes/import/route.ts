@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient()
 
     const records = rows.map((r: Record<string, string>) => ({
-      // Formato Tango ("Nomina Nico.xlsx"): Codigo, Razon social, Domicilio, Localidad, Codigo postal, Nro. de documento
+      // Formato Tango Nico.xlsx: Codigo, Razon social, Domicilio, Localidad, Codigo postal, Nro. de documento, Descripcion (forma de pago)
       // Formato generico: COD_CLIENT, RAZON_SOCI, DOMICILIO, LOCALIDAD, C_POSTALI, DENTIFTRI
       cod_client: String(r["CODIGO"] ?? r["COD_CLIENT"] ?? r["cod_client"] ?? "").trim(),
       razon_soci: (r["RAZON SOCIAL"] ?? r["RAZON_SOCI"] ?? r["razon_soci"] ?? "").trim(),
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       localidad:  (r["LOCALIDAD"] ?? r["localidad"] ?? "").trim() || null,
       c_postali:  (r["CODIGO POSTAL"] ?? r["C_POSTALI"] ?? r["c_postali"] ?? "").trim() || null,
       dentiftri:  (r["NRO. DE DOCUMENTO"] ?? r["DENTIFTRI"] ?? r["dentiftri"] ?? "").trim() || null,
+      forma_pago: (r["DESCRIPCION"] ?? r["FORMA_PAGO"] ?? r["forma_pago"] ?? "").trim() || null,
     })).filter((r) => r.cod_client && r.razon_soci)
 
     if (records.length === 0) {

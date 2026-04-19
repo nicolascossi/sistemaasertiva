@@ -17,6 +17,7 @@ export interface Cliente {
   localidad: string | null
   c_postali: string | null
   dentiftri: string | null
+  forma_pago: string | null
   created_at: string
   updated_at: string
 }
