@@ -129,7 +129,7 @@ export function ClientesClient({ initialData, error }: Props) {
           <CsvImportDialog
             title="Importar Clientes desde Excel"
             description="Importá la nómina de clientes desde el Excel de Tango. Todos los clientes existentes serán reemplazados por la nueva lista."
-            expectedColumns={["Codigo", "Razon social", "Domicilio", "Localidad", "Codigo postal", "Nro. de documento"]}
+            expectedColumns={["Codigo", "Razon social", "Domicilio", "Localidad", "Codigo postal", "Nro. de documento", "Descripcion"]}
             apiEndpoint="/api/clientes/import"
             onSuccess={refresh}
           />
@@ -183,13 +183,14 @@ export function ClientesClient({ initialData, error }: Props) {
               ))}
               <TableHead className="font-semibold text-foreground">Domicilio</TableHead>
               <TableHead className="font-semibold text-foreground w-24">C. Postal</TableHead>
+              <TableHead className="font-semibold text-foreground">Cond. de Pago</TableHead>
               <TableHead className="w-28 text-right font-semibold text-foreground">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginated.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
                   {search
                     ? "No se encontraron clientes para la búsqueda."
                     : "No hay clientes. Importá el Excel de Tango o creá uno manualmente."}
@@ -208,6 +209,7 @@ export function ClientesClient({ initialData, error }: Props) {
                   <TableCell className="text-muted-foreground text-sm font-mono">{cliente.dentiftri ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">{cliente.domicilio ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-sm font-mono">{cliente.c_postali ?? "—"}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">{cliente.forma_pago ?? "—"}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       <Button
