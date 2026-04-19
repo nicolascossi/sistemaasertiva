@@ -172,7 +172,7 @@ export async function generarCotizacionPDF(
   doc.setFont("helvetica", "bold")
   doc.text("N\u00B0 Cotizaci\u00F3n:", colRight, 21)
   doc.setFont("helvetica", "normal")
-  doc.text(cotizacion.numero, rightEdge, 21, { align: "right" })
+  doc.text(String(cotizacion.numero).padStart(5, "0"), rightEdge, 21, { align: "right" })
 
   if (cuitEmpresa) {
     doc.setFont("helvetica", "bold")
@@ -438,5 +438,5 @@ export async function generarCotizacionPDF(
   doc.setTextColor(...pink)
   doc.text("Gracias por elegirnos!", margin + (pageW - margin * 2 - qrSize - 5) / 2 + margin, graciasY, { align: "center" })
 
-  doc.save(`cotizacion-${cotizacion.numero}.pdf`)
+  doc.save(`cotizacion-${String(cotizacion.numero).padStart(5, "0")}.pdf`)
 }

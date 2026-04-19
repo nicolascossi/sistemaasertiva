@@ -204,7 +204,7 @@ export function CotizacionesClient({ initialCotizaciones }: Props) {
                     {/* Left: info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-sm font-bold text-foreground font-mono">{cot.numero}</span>
+                        <span className="text-sm font-bold text-foreground font-mono">{String(cot.numero).padStart(5, "0")}</span>
                         <Badge
                           variant="outline"
                           className={cn("text-xs border", estadoCfg.className)}

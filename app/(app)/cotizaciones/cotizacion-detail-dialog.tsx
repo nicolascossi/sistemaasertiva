@@ -260,7 +260,7 @@ export function CotizacionDetailDialog({ cotizacion, open, onOpenChange, onUpdat
         <DialogHeader className="flex flex-row items-start justify-between border-b border-border px-6 py-4 space-y-0">
           <div>
             <DialogTitle className="text-base font-bold text-foreground font-mono">
-              {cotizacion.numero}
+              {String(cotizacion.numero).padStart(5, "0")}
             </DialogTitle>
             <p className="text-sm text-foreground font-medium mt-0.5">{cotizacion.razon_soci}</p>
             <p className="text-xs text-muted-foreground mt-0.5">
