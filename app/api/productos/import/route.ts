@@ -10,15 +10,22 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient()
 
+    // Convierte precios en formato argentino: "$ 114.689,15" → 114689.15
+    function parsePrecio(raw: string): number {
+      const cleaned = raw
+        .replace(/\$/g, "")   // quita el signo $
+        .replace(/\s/g, "")   // quita espacios
+        .replace(/\./g, "")   // quita puntos (separador de miles)
+        .replace(",", ".")    // reemplaza coma decimal por punto
+      return parseFloat(cleaned) || 0
+    }
+
     const records = rows.map((r: Record<string, string>) => ({
       cod_artic: String(r["COD_ARTIC"] ?? r["cod_artic"] ?? "").trim(),
       descrip: String(r["DESCRIP"] ?? r["descrip"] ?? "").trim(),
       desc_adic: (r["DESC_ADIC"] ?? r["desc_adic"] ?? "").trim() || null,
       marca: (r["MARCA"] ?? r["marca"] ?? "").trim() || null,
-      // Acepta PRECIO (Excel) o LISTA (CSV)
-      lista: parseFloat(
-        String(r["PRECIO"] ?? r["precio"] ?? r["LISTA"] ?? r["lista"] ?? "0").replace(",", ".")
-      ) || 0,
+      lista: parsePrecio(String(r["PRECIO"] ?? r["precio"] ?? r["LISTA"] ?? r["lista"] ?? "0")),
     })).filter((r) => r.cod_artic && r.descrip)
 
     // Borrar todos los productos existentes antes de importar la nueva lista
