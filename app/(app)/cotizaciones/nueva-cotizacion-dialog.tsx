@@ -52,6 +52,8 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
 
   // --- Obs, forma de pago, atte, expte y estado general ---
   const [observaciones, setObservaciones] = useState("")
+  const [mantenimiento, setMantenimiento] = useState("")
+  const [plazoEntrega, setPlazoEntrega] = useState("")
   const [atte, setAtte] = useState("")
   const [expte, setExpte] = useState("")
   const [saving, setSaving] = useState(false)
@@ -70,6 +72,8 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
       setProductoSuggestions([])
       setItems([])
       setObservaciones("")
+      setMantenimiento("")
+      setPlazoEntrega("")
       setAtte("")
       setExpte("")
       setSaveError(null)
@@ -221,6 +225,8 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
           estado: "borrador",
           observaciones: observaciones || null,
           forma_pago: clienteSeleccionado.forma_pago || null,
+          mantenimiento_oferta: mantenimiento || null,
+          plazo_entrega: plazoEntrega || null,
           atte: atte || null,
           expte: expte || null,
         })
@@ -417,6 +423,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
                         step={1}
                         value={item.cantidad}
                         onChange={(e) => updateCantidad(item.tempId, Number(e.target.value))}
+                        onFocus={(e) => e.target.select()}
                         className="h-8 text-center bg-white border-border text-sm w-full"
                       />
                     </div>
@@ -427,6 +434,7 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
                         step={0.01}
                         value={item.precio_unitario}
                         onChange={(e) => updatePrecio(item.tempId, Number(e.target.value))}
+                        onFocus={(e) => e.target.select()}
                         className="h-8 text-right bg-white border-border text-sm w-full"
                       />
                     </div>
@@ -459,7 +467,31 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
             </div>
           )}
 
-          {/* ATTE + EXPTE + FORMA DE PAGO + OBSERVACIONES */}
+          {/* MANTENIMIENTO + PLAZO + ATTE + EXPTE + OBSERVACIONES */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Mantenimiento de Oferta
+              </Label>
+              <Input
+                placeholder="Ej: 10 días..."
+                value={mantenimiento}
+                onChange={(e) => setMantenimiento(e.target.value)}
+                className="bg-white border-border text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Plazo de Entrega
+              </Label>
+              <Input
+                placeholder="Ej: Inmediato luego de recibida la OC..."
+                value={plazoEntrega}
+                onChange={(e) => setPlazoEntrega(e.target.value)}
+                className="bg-white border-border text-sm"
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">

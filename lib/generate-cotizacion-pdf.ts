@@ -397,15 +397,19 @@ export async function generarCotizacionPDF(
   doc.setFont("helvetica", "normal")
   doc.text(cotizacion.forma_pago ?? "CUENTA CORRIENTE 30 DIAS", margin + 28, condY + 7)
 
-  doc.setFont("helvetica", "bold")
-  doc.text("Mantenimiento de Oferta:", margin, condY + 14)
-  doc.setFont("helvetica", "normal")
-  doc.text("10 DIAS", margin + 42, condY + 14)
+  if (cotizacion.mantenimiento_oferta) {
+    doc.setFont("helvetica", "bold")
+    doc.text("Mantenimiento de Oferta:", margin, condY + 14)
+    doc.setFont("helvetica", "normal")
+    doc.text(cotizacion.mantenimiento_oferta, margin + 42, condY + 14)
+  }
 
-  doc.setFont("helvetica", "bold")
-  doc.text("Plazo de Entrega:", margin, condY + 21)
-  doc.setFont("helvetica", "normal")
-  doc.text("INMEDIATO LUEGO DE RECIBIDA LA ORDEN DE COMPRA", margin + 30, condY + 21)
+  if (cotizacion.plazo_entrega) {
+    doc.setFont("helvetica", "bold")
+    doc.text("Plazo de Entrega:", margin, condY + 21)
+    doc.setFont("helvetica", "normal")
+    doc.text(cotizacion.plazo_entrega, margin + 30, condY + 21)
+  }
 
   doc.setFont("helvetica", "normal")
   doc.setFontSize(7.5)
