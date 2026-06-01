@@ -175,8 +175,11 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
     )
   }
 
-  function updatePrecio(tempId: string, precio: number) {
-    if (precio < 0) return
+  function updatePrecio(tempId: string, raw: string) {
+    // Acepta tanto punto como coma como separador decimal
+    const cleaned = raw.replace(/\./g, "").replace(",", ".")
+    const precio = parseFloat(cleaned)
+    if (isNaN(precio) || precio < 0) return
     setItems((prev) =>
       prev.map((i) =>
         i.tempId === tempId
@@ -429,11 +432,11 @@ export function NuevaCotizacionDialog({ open, onOpenChange, onCreated }: Props) 
                     </div>
                     <div className="px-4 py-3">
                       <Input
-                        type="number"
-                        min={0}
-                        step={0.01}
-                        value={item.precio_unitario}
-                        onChange={(e) => updatePrecio(item.tempId, Number(e.target.value))}
+                        type="text"
+                        inputMode="decimal"
+                        defaultValue={item.precio_unitario === 0 ? "" : String(item.precio_unitario).replace(".", ",")}
+                        key={item.tempId + "-precio"}
+                        onBlur={(e) => updatePrecio(item.tempId, e.target.value)}
                         onFocus={(e) => e.target.select()}
                         className="h-8 text-right bg-white border-border text-sm w-full"
                       />
