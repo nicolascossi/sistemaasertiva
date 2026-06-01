@@ -10,14 +10,25 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient()
 
-    // Convierte precios en formato argentino: "$ 114.689,15" → 114689.15
+    // Convierte precios en cualquier formato numérico al valor correcto
+    // Soporta: "$ 17.445,78" → 17445.78 | "17445.78" → 17445.78 | "17445,78" → 17445.78
     function parsePrecio(raw: string): number {
-      const cleaned = raw
-        .replace(/\$/g, "")   // quita el signo $
-        .replace(/\s/g, "")   // quita espacios
-        .replace(/\./g, "")   // quita puntos (separador de miles)
-        .replace(",", ".")    // reemplaza coma decimal por punto
-      return parseFloat(cleaned) || 0
+      let s = raw.replace(/\$/g, "").replace(/\s/g, "").trim()
+      const hasDot   = s.includes(".")
+      const hasComma = s.includes(",")
+
+      if (hasDot && hasComma) {
+        // Formato argentino: 17.445,78 → puntos=miles, coma=decimal
+        s = s.replace(/\./g, "").replace(",", ".")
+      } else if (hasDot && !hasComma) {
+        // Si el punto separa exactamente 3 dígitos al final es miles (1.234), sino es decimal (17445.78)
+        s = /\.\d{3}$/.test(s) ? s.replace(/\./g, "") : s
+      } else if (!hasDot && hasComma) {
+        // Coma como decimal: 17445,78
+        s = s.replace(",", ".")
+      }
+
+      return parseFloat(s) || 0
     }
 
     const records = rows.map((r: Record<string, string>) => ({
