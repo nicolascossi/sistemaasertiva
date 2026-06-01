@@ -36,7 +36,11 @@ export async function POST(req: NextRequest) {
       descrip: String(r["DESCRIP"] ?? r["descrip"] ?? "").trim(),
       desc_adic: (r["DESC_ADIC"] ?? r["desc_adic"] ?? "").trim() || null,
       marca: (r["MARCA"] ?? r["marca"] ?? "").trim() || null,
-      lista: parsePrecio(String(r["PRECIO"] ?? r["precio"] ?? r["LISTA"] ?? r["lista"] ?? "0")),
+      lista: parsePrecio(String(
+        r["PRECIO UNITARIO C/IVA (FINAL)"] ??
+        r["PRECIO UNITARIO C/IVA (Final)"] ??
+        r["PRECIO"] ?? r["precio"] ?? r["LISTA"] ?? r["lista"] ?? "0"
+      )),
     })).filter((r) => r.cod_artic && r.descrip)
 
     // Borrar todos los productos existentes antes de importar la nueva lista
